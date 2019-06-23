@@ -2,8 +2,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-
 def render_gazes_on_image(frame, outputs, window_width, window_height, window_height_cm, camera_h_from_screen_top):
 
     pixels_per_cm = window_height * 1. / window_height_cm
@@ -30,9 +28,19 @@ def render_gazes_on_image(frame, outputs, window_width, window_height, window_he
         screen_x = output[0,0] * pixels_per_cm + x_translation_from_camera_c 
         screen_y = -output[0,1] * pixels_per_cm + y_translation_from_camera_c
 
-        print("in px:", round(screen_x), round(screen_y))
+        #print("in px:", round(screen_x), round(screen_y))
+        if screen_x==640 and screen_y==360:
+            print('zheng')
+            yMin = h//4
+            yMax = h*3//4
+            xMin = w//4
+            xMax = w*3//4
 
-        if screen_x >= 920 and screen_y >= 350:
+            frame[yMin:yMax, xMin:xMax, 0] = frame[yMin:yMax, xMin:xMax, 0] * alphaReserve + BChannel * (1 - alphaReserve)
+            frame[yMin:yMax, xMin:xMax, 1] = frame[yMin:yMax, xMin:xMax, 1] * alphaReserve + GChannel * (1 - alphaReserve)
+            frame[yMin:yMax, xMin:xMax, 2] = frame[yMin:yMax, xMin:xMax, 2] * alphaReserve + RChannel * (1 - alphaReserve)
+            break
+        if screen_x >= 915 and screen_y >= 350:
             #  cv2.circle(frame, (20, 20), 5, (0, 0, 255), -1)
             #cv2.circle(frame, (int(round(screen_x)),int(round(screen_y))), 5, (0, 0, 255), -1)
             print('↘ bottom right corner')
@@ -45,7 +53,7 @@ def render_gazes_on_image(frame, outputs, window_width, window_height, window_he
             frame[yMin:yMax, xMin:xMax, 1] = frame[yMin:yMax, xMin:xMax, 1] * alphaReserve + GChannel * (1 - alphaReserve)
             frame[yMin:yMax, xMin:xMax, 2] = frame[yMin:yMax, xMin:xMax, 2] * alphaReserve + RChannel * (1 - alphaReserve)
 
-        elif screen_x >=920 and screen_y <= 350:
+        elif screen_x >=915 and screen_y <= 350:
             print('↗ upper right corner')
             yMin = 0
             yMax = h//2
@@ -55,7 +63,7 @@ def render_gazes_on_image(frame, outputs, window_width, window_height, window_he
             frame[yMin:yMax, xMin:xMax, 0] = frame[yMin:yMax, xMin:xMax, 0] * alphaReserve + BChannel * (1 - alphaReserve)
             frame[yMin:yMax, xMin:xMax, 1] = frame[yMin:yMax, xMin:xMax, 1] * alphaReserve + GChannel * (1 - alphaReserve)
             frame[yMin:yMax, xMin:xMax, 2] = frame[yMin:yMax, xMin:xMax, 2] * alphaReserve + RChannel * (1 - alphaReserve)
-        elif screen_x <=920 and screen_y >= 350:
+        elif screen_x <=915 and screen_y >= 350:
             print('↙ bottom left corner')
             yMin = h//2
             yMax = h
@@ -65,7 +73,7 @@ def render_gazes_on_image(frame, outputs, window_width, window_height, window_he
             frame[yMin:yMax, xMin:xMax, 0] = frame[yMin:yMax, xMin:xMax, 0] * alphaReserve + BChannel * (1 - alphaReserve)
             frame[yMin:yMax, xMin:xMax, 1] = frame[yMin:yMax, xMin:xMax, 1] * alphaReserve + GChannel * (1 - alphaReserve)
             frame[yMin:yMax, xMin:xMax, 2] = frame[yMin:yMax, xMin:xMax, 2] * alphaReserve + RChannel * (1 - alphaReserve)
-        elif screen_x <=920 and screen_y <= 350:
+        elif screen_x <=915 and screen_y <= 350:
             print('↖ upper left corner')
             yMin = 0
             yMax = h//2
@@ -75,16 +83,7 @@ def render_gazes_on_image(frame, outputs, window_width, window_height, window_he
             frame[yMin:yMax, xMin:xMax, 0] = frame[yMin:yMax, xMin:xMax, 0] * alphaReserve + BChannel * (1 - alphaReserve)
             frame[yMin:yMax, xMin:xMax, 1] = frame[yMin:yMax, xMin:xMax, 1] * alphaReserve + GChannel * (1 - alphaReserve)
             frame[yMin:yMax, xMin:xMax, 2] = frame[yMin:yMax, xMin:xMax, 2] * alphaReserve + RChannel * (1 - alphaReserve)
-        else:
-            print('㊣')
-            yMin = h//4
-            yMax = h*3//4
-            xMin = w//4
-            xMax = w*3//4
-
-            frame[yMin:yMax, xMin:xMax, 0] = frame[yMin:yMax, xMin:xMax, 0] * alphaReserve + BChannel * (1 - alphaReserve)
-            frame[yMin:yMax, xMin:xMax, 1] = frame[yMin:yMax, xMin:xMax, 1] * alphaReserve + GChannel * (1 - alphaReserve)
-            frame[yMin:yMax, xMin:xMax, 2] = frame[yMin:yMax, xMin:xMax, 2] * alphaReserve + RChannel * (1 - alphaReserve)
+            
     return frame
     """        
     cv2.namedWindow('img', cv2.WINDOW_NORMAL)

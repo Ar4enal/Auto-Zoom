@@ -1,20 +1,26 @@
-import numpy as np
 import cv2
+import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
-from rendering import render_gazes_on_image
 from features import extract_image_features
 from gaze_tf import test_imgs
 from render_s import detect_gaze,draw_gaze
+from zoom_in_out import zoom
 
-#window_width = 1280
-#window_height = 720
+stadium = cv2.imread('C:/Users/DELL/Desktop/gaze/stadium.jpg')
+cv2.namedWindow('stadium', cv2.WINDOW_NORMAL)
+cv2.resizeWindow('stadium',1280,720)
+cv2.namedWindow('zoom', cv2.WINDOW_NORMAL)
+cv2.resizeWindow('zoom',1280,720)
+
+cv2.imshow('stadium',stadium)
 
 def show_gaze(img):
     img, faces, face_features = extract_image_features(img)
     return test_imgs(img, faces, face_features)
 
-class GazeDetectStream:
+
+class GazeDetectStreamPicture:
     
     def __init__(self):
         cap = cv2.VideoCapture(0)
@@ -32,7 +38,7 @@ class GazeDetectStream:
         self.multiplier = self.fps * 1
         self.g = 0
         #self.frameID = int(round(self.cap.get(1)))
-        
+
 
     def __iter__(self):
         return self
@@ -49,14 +55,14 @@ class GazeDetectStream:
             print(self.frameID)
             gaze = detect_gaze(frame,outputs,1280,720,12,720)
             self.g = gaze
-        return frame, self.g
+        return self.g
         
-for frame, g in GazeDetectStream():   
+for g in GazeDetectStreamPicture():   
     #result = render_gazes_on_image(frame,outputs,1280,720,12,720)
-    result = draw_gaze(frame,g)
-    cv2.imshow('result',result)
+
+    result = zoom(stadium,g)
+    cv2.imshow('zoom',result)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()
-
