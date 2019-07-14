@@ -1,2 +1,2 @@
 # Auto-Zoom
-machine learning and computer vision project
+deep learning and computer vision project
