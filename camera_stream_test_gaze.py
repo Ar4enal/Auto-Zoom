@@ -3,9 +3,9 @@ import cv2
 import warnings
 warnings.filterwarnings("ignore")
 from rendering import render_gazes_on_image
-from features import extract_image_features
+from features import extract_image_features, draw_detected_features
 from gaze_tf import test_imgs
-from render_s import detect_gaze,draw_gaze
+from render_s import detect_gaze, draw_gaze
 
 #window_width = 1280
 #window_height = 720
@@ -31,8 +31,7 @@ class GazeDetectStream:
         self.fps = cap.get(cv2.CAP_PROP_FPS)
         self.multiplier = self.fps * 1
         self.g = 0
-        #self.frameID = int(round(self.cap.get(1)))
-        
+        self.timer = 0
 
     def __iter__(self):
         return self
@@ -43,20 +42,46 @@ class GazeDetectStream:
         #print(self.frameID)
         outputs=[]
         ret, frame = self.cap.read()
-        
+        img, dfaces, dface_features = extract_image_features(frame)
         if self.frameID % self.multiplier == 0:
             outputs = show_gaze(frame)
             print(self.frameID)
             gaze = detect_gaze(frame,outputs,1280,720,12,720)
+            if self.g != gaze:
+                self.timer = 0
+                print('last for: %i seconds'%self.timer)
+            else:
+                self.timer += 1
+                print('last for: %i seconds'%self.timer)
             self.g = gaze
-        return frame, self.g
-        
-for frame, g in GazeDetectStream():   
-    #result = render_gazes_on_image(frame,outputs,1280,720,12,720)
+            
+        return frame, self.g, dfaces, dface_features
+
+"""        
+for frame, g, dfaces, dface_features in GazeDetectStream():   
+
+    draw_detected_features(frame,dfaces,dface_features)
+    
     result = draw_gaze(frame,g)
     cv2.imshow('result',result)
+    
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cv2.destroyAllWindows()
+"""
 
+def start():
+
+    for frame, g, dfaces, dface_features in GazeDetectStream():   
+        
+        draw_detected_features(frame,dfaces,dface_features)
+        result = draw_gaze(frame,g)
+        cv2.imshow('result',result)
+    
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cv2.destroyAllWindows()
+
+start()
